@@ -1,0 +1,261 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { AppHeader } from "@/components/app-header"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { Plus, Edit, Trash2, TrendingUp } from "lucide-react"
+
+const incomeCategories = ["Salary", "Freelance", "Business", "Investment", "Rental", "Other"]
+
+const sampleIncomes = [
+  { id: 1, date: "2024-01-01", source: "Tech Corp", category: "Salary", amount: 5000, description: "Monthly salary" },
+  {
+    id: 2,
+    date: "2024-01-15",
+    source: "Client Project",
+    category: "Freelance",
+    amount: 1200,
+    description: "Web development project",
+  },
+  {
+    id: 3,
+    date: "2024-01-10",
+    source: "Stock Dividends",
+    category: "Investment",
+    amount: 150,
+    description: "Quarterly dividends",
+  },
+  {
+    id: 4,
+    date: "2024-01-05",
+    source: "Rental Property",
+    category: "Rental",
+    amount: 800,
+    description: "Monthly rent",
+  },
+]
+
+export default function IncomePage() {
+  const [incomes, setIncomes] = useState(sampleIncomes)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingIncome, setEditingIncome] = useState<any>(null)
+  const [formData, setFormData] = useState({
+    source: "",
+    category: "",
+    amount: "",
+    date: "",
+    description: "",
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const newIncome = {
+      id: editingIncome ? editingIncome.id : Date.now(),
+      source: formData.source,
+      category: formData.category,
+      amount: Number.parseFloat(formData.amount),
+      date: formData.date,
+      description: formData.description,
+    }
+
+    if (editingIncome) {
+      setIncomes(incomes.map((income) => (income.id === editingIncome.id ? newIncome : income)))
+    } else {
+      setIncomes([...incomes, newIncome])
+    }
+
+    setFormData({ source: "", category: "", amount: "", date: "", description: "" })
+    setEditingIncome(null)
+    setIsDialogOpen(false)
+  }
+
+  const handleEdit = (income: any) => {
+    setEditingIncome(income)
+    setFormData({
+      source: income.source,
+      category: income.category,
+      amount: income.amount.toString(),
+      date: income.date,
+      description: income.description,
+    })
+    setIsDialogOpen(true)
+  }
+
+  const handleDelete = (id: number) => {
+    setIncomes(incomes.filter((income) => income.id !== id))
+  }
+
+  const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0)
+
+  return (
+    <div className="flex flex-1 flex-col gap-4 p-4">
+      <AppHeader title="Income" breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }]} />
+
+      {/* Summary Card */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardTitle className="text-sm font-medium">Total Income This Month</CardTitle>
+            <CardDescription>All your income sources combined</CardDescription>
+          </div>
+          <TrendingUp className="h-4 w-4 text-green-600" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-green-600">${totalIncome.toLocaleString()}</div>
+        </CardContent>
+      </Card>
+
+      {/* Add Income Form */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Income Records</CardTitle>
+            <CardDescription>Track all your income sources</CardDescription>
+          </div>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {
+                  setEditingIncome(null)
+                  setFormData({ source: "", category: "", amount: "", date: "", description: "" })
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Income
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{editingIncome ? "Edit Income" : "Add New Income"}</DialogTitle>
+                <DialogDescription>
+                  {editingIncome ? "Update your income record." : "Add a new income source to track your earnings."}
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="source">Income Source</Label>
+                    <Input
+                      id="source"
+                      placeholder="e.g., Tech Corp, Client Name"
+                      value={formData.source}
+                      onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) => setFormData({ ...formData, category: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {incomeCategories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="amount">Amount</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="date">Date</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Optional description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit">{editingIncome ? "Update" : "Add"} Income</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Source</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {incomes.map((income) => (
+                <TableRow key={income.id}>
+                  <TableCell className="font-medium">{income.date}</TableCell>
+                  <TableCell>{income.source}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{income.category}</Badge>
+                  </TableCell>
+                  <TableCell>{income.description}</TableCell>
+                  <TableCell className="text-right font-medium text-green-600">+${income.amount.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleEdit(income)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(income.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
