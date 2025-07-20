@@ -1,5 +1,5 @@
 const express = require("express");
-const incomeController = require("../controllers/income.Controller");
+const incomeController = require("../controllers/income.controller");
 
 const incomeRouter = express.Router();
 incomeRouter.post("/create", incomeController.createIncome);
