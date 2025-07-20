@@ -1,15 +1,21 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { AppHeader } from "@/components/app-header"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useEffect, useState } from "react";
+import { AppHeader } from "@/components/app-header";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -18,64 +24,177 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Plus, Edit, AlertTriangle, CheckCircle, TrendingUp } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import {
+  Plus,
+  Edit,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
+  Filter,
+  Trash2,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
-const sampleBudgets = [
-  { id: 1, category: "Food & Dining", budget: 800, spent: 650, color: "bg-blue-500" },
-  { id: 2, category: "Transportation", budget: 300, spent: 280, color: "bg-green-500" },
-  { id: 3, category: "Shopping", budget: 500, spent: 620, color: "bg-yellow-500" },
-  { id: 4, category: "Entertainment", budget: 200, spent: 150, color: "bg-purple-500" },
-  { id: 5, category: "Bills & Utilities", budget: 400, spent: 380, color: "bg-red-500" },
-]
-
+const sampleBudgetColors: any = {
+  "Food & Dining": "bg-blue-500",
+  Transportation: "bg-green-500",
+  Shopping: "bg-yellow-500",
+  Entertainment: "bg-purple-500",
+  "Bills & Utilities": "bg-red-500",
+  Healthcare: "bg-red-500",
+  Education: "bg-green-500",
+  Travel: "bg-purple-500",
+  Other: "bg-yellow-500",
+};
 export default function BudgetPage() {
-  const [budgets, setBudgets] = useState(sampleBudgets)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingBudget, setEditingBudget] = useState<any>(null)
+  const [budgets, setBudgets] = useState<
+    {
+      _id: string;
+      color: string;
+      category: string;
+      budgeted: number;
+      spent: number;
+      remaining: number;
+      overBudget: boolean;
+    }[]
+  >([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingBudget, setEditingBudget] = useState<any>(null);
   const [formData, setFormData] = useState({
     category: "",
     budget: "",
-  })
+  });
+  const [filterCategory, setFilterCategory] = useState("all");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const expenseCategories = [
+    "Food & Dining",
+    "Transportation",
+    "Shopping",
+    "Entertainment",
+    "Bills & Utilities",
+    "Healthcare",
+    "Education",
+    "Travel",
+    "Other",
+  ];
+  const getAllBudget = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/budget/get-all");
+      const data = await response.json();
+      if (data.status) {
+        setBudgets(
+          data.data.map((budget: any) => ({
+            ...budget,
+            color: sampleBudgetColors[budget.category],
+          }))
+        );
+      } else {
+        throw new Error("unable to get income data");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Something Went Wrong!");
+    }
+  };
+  useEffect(() => {
+    getAllBudget();
+  }, []);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     const newBudget = {
-      id: editingBudget ? editingBudget.id : Date.now(),
-      category: formData.category,
+      id: editingBudget ? editingBudget._id : Date.now(),
+      category: filterCategory,
       budget: Number.parseFloat(formData.budget),
       spent: editingBudget ? editingBudget.spent : 0,
       color: editingBudget ? editingBudget.color : "bg-gray-500",
-    }
+    };
+    console.log(newBudget);
 
     if (editingBudget) {
-      setBudgets(budgets.map((budget) => (budget.id === editingBudget.id ? newBudget : budget)))
+      try {
+        const response = await fetch("http://localhost:5000/budget/update", {
+          method: "PATCH",
+          body: JSON.stringify({
+            _id: editingBudget._id,
+            category: newBudget.category,
+            amount: newBudget.budget,
+          }),
+          headers: { "content-type": "application/json" },
+        });
+        const data = await response.json();
+        if (data.status) {
+          getAllBudget();
+        } else {
+          throw new Error("unable to create budget");
+        }
+      } catch (error) {}
     } else {
-      setBudgets([...budgets, newBudget])
-    }
+      try {
+        const response = await fetch("http://localhost:5000/budget/create", {
+          method: "POST",
+          body: JSON.stringify(newBudget),
+          headers: { "content-type": "application/json" },
+        });
+        const data = await response.json();
+        if (data.status) {
+        } else {
+          throw new Error("unable to create budget");
+        }
+      } catch (error) {}
 
-    setFormData({ category: "", budget: "" })
-    setEditingBudget(null)
-    setIsDialogOpen(false)
-  }
+      setFormData({ category: "", budget: "" });
+      setEditingBudget(null);
+      setIsDialogOpen(false);
+    }
+  };
 
   const handleEdit = (budget: any) => {
-    setEditingBudget(budget)
+    setEditingBudget(budget);
     setFormData({
       category: budget.category,
-      budget: budget.budget.toString(),
-    })
-    setIsDialogOpen(true)
-  }
+      budget: budget.budgeted.toString(),
+    });
+    setFilterCategory(budget.category);
+    setIsDialogOpen(true);
+  };
 
-  const totalBudget = budgets.reduce((sum, budget) => sum + budget.budget, 0)
-  const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0)
-  const overBudgetCategories = budgets.filter((budget) => budget.spent > budget.budget)
+  const totalBudget = budgets.reduce((sum, budget) => sum + budget.budgeted, 0);
+  const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0);
+  const overBudgetCategories = budgets.filter(
+    (budget) => budget.spent > budget.budgeted
+  );
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch("http://localhost:5000/budget/delete", {
+        method: "DELETE",
+        body: JSON.stringify({ _id: id }),
+        headers: { "content-type": "application/json" },
+      });
+      const data = await response.json();
+      if (data.status) {
+        await getAllBudget();
+      } else {
+        throw new Error("unable to delete");
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
-      <AppHeader title="Budget" breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }]} />
+      <AppHeader
+        title="Budget"
+        breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }]}
+      />
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
@@ -85,8 +204,12 @@ export default function BudgetPage() {
             <TrendingUp className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalBudget.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Monthly budget limit</p>
+            <div className="text-2xl font-bold">
+              ${totalBudget.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Monthly budget limit
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -95,7 +218,9 @@ export default function BudgetPage() {
             <TrendingUp className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">${totalSpent.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-red-600">
+              ${totalSpent.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               {((totalSpent / totalBudget) * 100).toFixed(1)}% of budget used
             </p>
@@ -107,7 +232,9 @@ export default function BudgetPage() {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${(totalBudget - totalSpent).toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-600">
+              ${(totalBudget - totalSpent).toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">Available to spend</p>
           </CardContent>
         </Card>
@@ -118,8 +245,11 @@ export default function BudgetPage() {
         <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
           <AlertTriangle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-800 dark:text-red-200">
-            <strong>Budget Alert:</strong> You're over budget in {overBudgetCategories.length}
-            {overBudgetCategories.length === 1 ? " category" : " categories"}:{" "}
+            <strong>Budget Alert:</strong> You're over budget in{" "}
+            {overBudgetCategories.length}
+            {overBudgetCategories.length === 1
+              ? " category"
+              : " categories"}:{" "}
             {overBudgetCategories.map((cat) => cat.category).join(", ")}
           </AlertDescription>
         </Alert>
@@ -130,14 +260,16 @@ export default function BudgetPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Budget Categories</CardTitle>
-            <CardDescription>Set and track your monthly spending limits</CardDescription>
+            <CardDescription>
+              Set and track your monthly spending limits
+            </CardDescription>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 onClick={() => {
-                  setEditingBudget(null)
-                  setFormData({ category: "", budget: "" })
+                  setEditingBudget(null);
+                  setFormData({ category: "", budget: "" });
                 }}
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -146,23 +278,36 @@ export default function BudgetPage() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{editingBudget ? "Edit Budget" : "Add New Budget"}</DialogTitle>
+                <DialogTitle>
+                  {editingBudget ? "Edit Budget" : "Add New Budget"}
+                </DialogTitle>
                 <DialogDescription>
-                  {editingBudget ? "Update your budget limit." : "Set a monthly budget limit for a category."}
+                  {editingBudget
+                    ? "Update your budget limit."
+                    : "Set a monthly budget limit for a category."}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit}>
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
                     <Label htmlFor="category">Category</Label>
-                    <Input
-                      id="category"
-                      placeholder="e.g., Food & Dining"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      required
-                      disabled={!!editingBudget}
-                    />
+                    <Select
+                      value={filterCategory}
+                      onValueChange={setFilterCategory}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {expenseCategories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="budget">Monthly Budget</Label>
@@ -172,13 +317,17 @@ export default function BudgetPage() {
                       step="0.01"
                       placeholder="0.00"
                       value={formData.budget}
-                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, budget: e.target.value })
+                      }
                       required
                     />
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit">{editingBudget ? "Update" : "Add"} Budget</Button>
+                  <Button type="submit">
+                    {editingBudget ? "Update" : "Add"} Budget
+                  </Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -187,11 +336,11 @@ export default function BudgetPage() {
         <CardContent>
           <div className="space-y-6">
             {budgets.map((budget) => {
-              const percentage = (budget.spent / budget.budget) * 100
-              const isOverBudget = budget.spent > budget.budget
+              const percentage = (budget.spent / budget.budgeted) * 100;
+              const isOverBudget = budget.spent > budget.budgeted;
 
               return (
-                <div key={budget.id} className="space-y-2">
+                <div key={budget._id} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${budget.color}`} />
@@ -204,33 +353,57 @@ export default function BudgetPage() {
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-muted-foreground">
-                        ${budget.spent.toFixed(2)} / ${budget.budget.toFixed(2)}
+                        ${budget.spent.toFixed(2)} / $
+                        {budget.budgeted.toFixed(2)}
                       </span>
-                      <Button variant="ghost" size="sm" onClick={() => handleEdit(budget)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(budget)}
+                      >
                         <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(budget._id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <Progress
                       value={Math.min(percentage, 100)}
-                      className={`h-2 ${isOverBudget ? "[&>div]:bg-red-500" : ""}`}
+                      className={`h-2 ${
+                        isOverBudget ? "[&>div]:bg-red-500" : ""
+                      }`}
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>{percentage.toFixed(1)}% used</span>
-                      <span className={isOverBudget ? "text-red-600 font-medium" : "text-green-600"}>
+                      <span
+                        className={
+                          isOverBudget
+                            ? "text-red-600 font-medium"
+                            : "text-green-600"
+                        }
+                      >
                         {isOverBudget
-                          ? `$${(budget.spent - budget.budget).toFixed(2)} over`
-                          : `$${(budget.budget - budget.spent).toFixed(2)} remaining`}
+                          ? `$${(budget.spent - budget.budgeted).toFixed(
+                              2
+                            )} over`
+                          : `$${(budget.budgeted - budget.spent).toFixed(
+                              2
+                            )} remaining`}
                       </span>
                     </div>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -79,7 +79,9 @@ export default function IncomePage() {
   });
   const getAllIncome = async () => {
     try {
-      const response = await fetch("http://localhost:5000/income/get-all");
+      const response = await fetch("http://localhost:5000/income/get-all", {
+        headers: { authentication: localStorage.getItem("userId") || "" },
+      });
       const data = await response.json();
       if (data.status) {
         setIncomes(data.data);
@@ -123,7 +125,10 @@ export default function IncomePage() {
       try {
         const response = await fetch("http://localhost:5000/income/create", {
           method: "POST",
-          body: JSON.stringify(newIncome),
+          body: JSON.stringify({
+            ...newIncome,
+            userId: localStorage.getItem("userId") || "",
+          }),
           headers: { "content-type": "application/json" },
         });
         const data = await response.json();

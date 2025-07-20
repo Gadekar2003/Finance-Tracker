@@ -36,6 +36,7 @@ export default function LoginPage() {
     if (data.status) {
       localStorage.setItem("username", data.data.name);
       localStorage.setItem("useremail", data.data.email);
+      localStorage.setItem("userId", data.data._id);
 
       router.push("/dashboard");
     } else {

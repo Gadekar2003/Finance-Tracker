@@ -36,6 +36,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { LocaleRouteNormalizer } from "next/dist/server/normalizers/locale-route-normalizer";
+import { useEffect, useState } from "react";
 
 const navigation = [
   {
@@ -83,20 +84,17 @@ const navigation = [
       },
     ],
   },
-  {
-    title: "Analytics",
-    items: [
-      {
-        title: "Reports",
-        url: "/reports",
-        icon: BarChart3,
-      },
-    ],
-  },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    setName(localStorage.getItem("username") || "");
+    setEmail(localStorage.getItem("useremail") || "");
+  }, []);
 
   return (
     <Sidebar>
@@ -149,8 +147,7 @@ export function AppSidebar() {
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarFallback className="rounded-lg">
-                      {localStorage
-                        .getItem("username")
+                      {name
                         ?.split(" ")
                         .map((word) => word.charAt(0).toUpperCase())
                         .slice(0, 2)
@@ -158,12 +155,8 @@ export function AppSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {localStorage.getItem("username")}
-                    </span>
-                    <span className="truncate text-xs">
-                      {localStorage.getItem("useremail")}
-                    </span>
+                    <span className="truncate font-semibold">{name}</span>
+                    <span className="truncate text-xs">{email}</span>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

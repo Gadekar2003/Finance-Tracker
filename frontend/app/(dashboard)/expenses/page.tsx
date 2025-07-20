@@ -77,7 +77,9 @@ export default function ExpensesPage() {
   });
   const getAllExpense = async () => {
     try {
-      const response = await fetch("http://localhost:5000/expenses/get-all");
+      const response = await fetch("http://localhost:5000/expenses/get-all", {
+        headers: { authentication: localStorage.getItem("userId") || "" },
+      });
       const data = await response.json();
       if (data.status) {
         setExpenses(data.data);
@@ -120,7 +122,10 @@ export default function ExpensesPage() {
       try {
         const response = await fetch("http://localhost:5000/expenses/create", {
           method: "POST",
-          body: JSON.stringify(newExpense),
+          body: JSON.stringify({
+            ...newExpense,
+            userId: localStorage.getItem("userId"),
+          }),
           headers: { "content-type": "application/json" },
         });
         const data = await response.json();

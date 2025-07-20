@@ -5,6 +5,8 @@ const { authRouter } = require("./routes/auth.route");
 const cors = require("cors");
 const { incomeRouter } = require("./routes/income.route");
 const { expenseRouter } = require("./routes/expense.routes");
+const { budgetRouter } = require("./routes/budget.route");
+const { metaRouter } = require("./routes/meta.route");
 
 const app = express();
 
@@ -22,6 +24,8 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/income", incomeRouter);
 app.use("/expenses", expenseRouter);
+app.use("/budget", budgetRouter);
+app.use("/metadata", metaRouter);
 // MongoDB connection (clean, no deprecated options)
 mongoose
   .connect(process.env.MONGO_URL)

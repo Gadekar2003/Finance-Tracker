@@ -36,8 +36,12 @@ const incomeController = {
     }
   },
   getAllIncome: async (req, res) => {
+    const userId = req.headers["authentication"]; // or lowercase version
+
     try {
-      const allIncome = await incomeModel.find().sort({ createdAt: -1 }); // ascending order
+      const allIncome = await incomeModel
+        .find({ userId })
+        .sort({ createdAt: -1 }); // ascending order
       res.send({
         message: "All Income data received",
         status: true,
@@ -52,10 +56,11 @@ const incomeController = {
   },
 
   createIncome: async (req, res) => {
-    const { source, amount, category, description } = req.body;
+    const { userId, source, amount, category, description } = req.body;
     try {
       console.log(req.body);
       const incomeData = await incomeModel.create({
+        userId,
         source,
         amount,
         category,

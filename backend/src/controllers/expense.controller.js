@@ -41,7 +41,12 @@ const expenseController = {
   },
   getAllExpense: async (req, res) => {
     try {
-      const allExpense = await expenseModel.find().sort({ createdAt: -1 }); // ascending order
+      const userId = req.headers["authentication"]; // or lowercase version
+
+      console.log(userId);
+      const allExpense = await expenseModel
+        .find({ userId })
+        .sort({ createdAt: -1 }); // ascending order
       res.send({
         message: "All Expense data received",
         status: true,
@@ -56,10 +61,11 @@ const expenseController = {
   },
 
   createExpense: async (req, res) => {
-    const { notes, amount, category, description } = req.body;
+    const { userId, notes, amount, category, description } = req.body;
     try {
       console.log(req.body);
       const expenseData = await expenseModel.create({
+        userId,
         notes,
         amount,
         category,
