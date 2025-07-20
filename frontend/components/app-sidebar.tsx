@@ -1,6 +1,6 @@
-"use client"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -13,15 +13,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -34,7 +34,8 @@ import {
   User,
   LogOut,
   Wallet,
-} from "lucide-react"
+} from "lucide-react";
+import { LocaleRouteNormalizer } from "next/dist/server/normalizers/locale-route-normalizer";
 
 const navigation = [
   {
@@ -92,10 +93,10 @@ const navigation = [
       },
     ],
   },
-]
+];
 
 export function AppSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <Sidebar>
@@ -147,12 +148,22 @@ export function AppSidebar() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src="/placeholder-user.jpg" alt="User" />
-                    <AvatarFallback className="rounded-lg">JD</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">
+                      {localStorage
+                        .getItem("username")
+                        ?.split(" ")
+                        .map((word) => word.charAt(0).toUpperCase())
+                        .slice(0, 2)
+                        .join("") || "NA"}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">John Doe</span>
-                    <span className="truncate text-xs">john@example.com</span>
+                    <span className="truncate font-semibold">
+                      {localStorage.getItem("username")}
+                    </span>
+                    <span className="truncate text-xs">
+                      {localStorage.getItem("useremail")}
+                    </span>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -188,5 +199,5 @@ export function AppSidebar() {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

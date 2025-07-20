@@ -22,15 +22,25 @@ export default function RegisterPage() {
     confirmPassword: "",
   })
   const [isRegistered, setIsRegistered] = useState(false)
+
   const router = useRouter()
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords don't match!")
       return
     }
-    setIsRegistered(true)
+    // setIsRegistered(true)
+    
+      const response=await fetch('http://localhost:5000/auth/register',{method:'POST',body:JSON.stringify({name:formData.name,email:formData.email,password:formData.password}),headers:{'content-type':'application/json'}})
+      const data=await response.json();
+      if(data.status){
+       router.push('/login')
+      }else{
+        throw new Error('unable to register')
+      }
+    
   }
 
   const handleInputChange = (field: string, value: string) => {
