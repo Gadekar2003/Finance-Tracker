@@ -61,8 +61,8 @@ my-finance-tracker/
 
 ## 🎥 Video Walkthrough
 
-- **Features Demo (1-3 min)**: [Watch Video](https://link-to-your-feature-demo)
-- **Codebase Overview (1-5 min)**: [Watch Video](https://link-to-your-code-demo)
+- **Features Demo (1-3 min)**: [Watch Video](https://www.youtube.com/watch?v=FngBe53_et8)
+- **Codebase Overview (1-5 min)**: [Watch Video](https://www.youtube.com/watch?v=tFk5tIxglOg)
 
 ---
 
