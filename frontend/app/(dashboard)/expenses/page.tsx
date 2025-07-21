@@ -77,9 +77,12 @@ export default function ExpensesPage() {
   });
   const getAllExpense = async () => {
     try {
-      const response = await fetch("http://localhost:5000/expenses/get-all", {
-        headers: { authentication: localStorage.getItem("userId") || "" },
-      });
+      const response = await fetch(
+        "https://finance-tracker-5mv4.onrender.com/expenses/get-all",
+        {
+          headers: { authentication: localStorage.getItem("userId") || "" },
+        }
+      );
       const data = await response.json();
       if (data.status) {
         setExpenses(data.data);
@@ -105,11 +108,14 @@ export default function ExpensesPage() {
 
     if (editingExpense) {
       try {
-        const response = await fetch("http://localhost:5000/expenses/update", {
-          method: "PATCH",
-          body: JSON.stringify({ ...newExpense, _id: editingExpense._id }),
-          headers: { "content-type": "application/json" },
-        });
+        const response = await fetch(
+          "https://finance-tracker-5mv4.onrender.com/expenses/update",
+          {
+            method: "PATCH",
+            body: JSON.stringify({ ...newExpense, _id: editingExpense._id }),
+            headers: { "content-type": "application/json" },
+          }
+        );
         const data = await response.json();
         if (data.status) {
           //refetch data
@@ -120,14 +126,17 @@ export default function ExpensesPage() {
       } catch (error) {}
     } else {
       try {
-        const response = await fetch("http://localhost:5000/expenses/create", {
-          method: "POST",
-          body: JSON.stringify({
-            ...newExpense,
-            userId: localStorage.getItem("userId"),
-          }),
-          headers: { "content-type": "application/json" },
-        });
+        const response = await fetch(
+          "https://finance-tracker-5mv4.onrender.com/expenses/create",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              ...newExpense,
+              userId: localStorage.getItem("userId"),
+            }),
+            headers: { "content-type": "application/json" },
+          }
+        );
         const data = await response.json();
         if (data.status) {
           getAllExpense();
@@ -160,11 +169,14 @@ export default function ExpensesPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch("http://localhost:5000/expenses/delete", {
-        method: "DELETE",
-        body: JSON.stringify({ _id: id }),
-        headers: { "content-type": "application/json" },
-      });
+      const response = await fetch(
+        "https://finance-tracker-5mv4.onrender.com/expenses/delete",
+        {
+          method: "DELETE",
+          body: JSON.stringify({ _id: id }),
+          headers: { "content-type": "application/json" },
+        }
+      );
       const data = await response.json();
       if (data.status) {
         await getAllExpense();

@@ -1,51 +1,68 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Wallet, Eye, EyeOff, CheckCircle } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Wallet, Eye, EyeOff, CheckCircle } from "lucide-react";
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-  })
-  const [isRegistered, setIsRegistered] = useState(false)
+  });
+  const [isRegistered, setIsRegistered] = useState(false);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!")
-      return
+      alert("Passwords don't match!");
+      return;
     }
     // setIsRegistered(true)
-    
-      const response=await fetch('http://localhost:5000/auth/register',{method:'POST',body:JSON.stringify({name:formData.name,email:formData.email,password:formData.password}),headers:{'content-type':'application/json'}})
-      const data=await response.json();
-      if(data.status){
-       router.push('/login')
-      }else{
-        throw new Error('unable to register')
+
+    const response = await fetch(
+      "https://finance-tracker-5mv4.onrender.com/auth/register",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+        headers: { "content-type": "application/json" },
       }
-    
-  }
+    );
+    const data = await response.json();
+    if (data.status) {
+      router.push("/login");
+    } else {
+      throw new Error("unable to register");
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   if (isRegistered) {
     return (
@@ -57,14 +74,19 @@ export default function RegisterPage() {
                 <CheckCircle className="h-8 w-8 text-white" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold">Registration Successful!</CardTitle>
-            <CardDescription>Please check your email to verify your account</CardDescription>
+            <CardTitle className="text-2xl font-bold">
+              Registration Successful!
+            </CardTitle>
+            <CardDescription>
+              Please check your email to verify your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Alert>
               <AlertDescription>
-                We've sent a verification email to <strong>{formData.email}</strong>. Please click the link in the email
-                to activate your account.
+                We've sent a verification email to{" "}
+                <strong>{formData.email}</strong>. Please click the link in the
+                email to activate your account.
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -75,7 +97,7 @@ export default function RegisterPage() {
           </CardFooter>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -88,7 +110,9 @@ export default function RegisterPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-          <CardDescription>Start your financial journey with FinanceTracker</CardDescription>
+          <CardDescription>
+            Start your financial journey with FinanceTracker
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
@@ -122,7 +146,9 @@ export default function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
                   value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("password", e.target.value)
+                  }
                   required
                 />
                 <Button
@@ -132,7 +158,11 @@ export default function RegisterPage() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -144,7 +174,9 @@ export default function RegisterPage() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("confirmPassword", e.target.value)
+                  }
                   required
                 />
                 <Button
@@ -154,7 +186,11 @@ export default function RegisterPage() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -173,5 +209,5 @@ export default function RegisterPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }

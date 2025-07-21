@@ -79,9 +79,12 @@ export default function IncomePage() {
   });
   const getAllIncome = async () => {
     try {
-      const response = await fetch("http://localhost:5000/income/get-all", {
-        headers: { authentication: localStorage.getItem("userId") || "" },
-      });
+      const response = await fetch(
+        "https://finance-tracker-5mv4.onrender.com/income/get-all",
+        {
+          headers: { authentication: localStorage.getItem("userId") || "" },
+        }
+      );
       const data = await response.json();
       if (data.status) {
         setIncomes(data.data);
@@ -108,11 +111,14 @@ export default function IncomePage() {
     console.log(newIncome);
     if (editingIncome) {
       try {
-        const response = await fetch("http://localhost:5000/income/update", {
-          method: "PATCH",
-          body: JSON.stringify({ ...newIncome, _id: editingIncome._id }),
-          headers: { "content-type": "application/json" },
-        });
+        const response = await fetch(
+          "https://finance-tracker-5mv4.onrender.com/income/update",
+          {
+            method: "PATCH",
+            body: JSON.stringify({ ...newIncome, _id: editingIncome._id }),
+            headers: { "content-type": "application/json" },
+          }
+        );
         const data = await response.json();
         if (data.status) {
           //refetch data
@@ -123,14 +129,17 @@ export default function IncomePage() {
       } catch (error) {}
     } else {
       try {
-        const response = await fetch("http://localhost:5000/income/create", {
-          method: "POST",
-          body: JSON.stringify({
-            ...newIncome,
-            userId: localStorage.getItem("userId") || "",
-          }),
-          headers: { "content-type": "application/json" },
-        });
+        const response = await fetch(
+          "https://finance-tracker-5mv4.onrender.com/income/create",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              ...newIncome,
+              userId: localStorage.getItem("userId") || "",
+            }),
+            headers: { "content-type": "application/json" },
+          }
+        );
         const data = await response.json();
         if (data.status) {
           getAllIncome();
@@ -159,11 +168,14 @@ export default function IncomePage() {
   const handleDelete = async (id: string) => {
     // setIncomes(incomes.filter((income) => income._id !== id));
     try {
-      const response = await fetch("http://localhost:5000/income/delete", {
-        method: "DELETE",
-        body: JSON.stringify({ _id: id }),
-        headers: { "content-type": "application/json" },
-      });
+      const response = await fetch(
+        "https://finance-tracker-5mv4.onrender.com/income/delete",
+        {
+          method: "DELETE",
+          body: JSON.stringify({ _id: id }),
+          headers: { "content-type": "application/json" },
+        }
+      );
       const data = await response.json();
       if (data.status) {
         await getAllIncome();

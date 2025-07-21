@@ -61,9 +61,12 @@ export default function DashboardPage() {
 
   const getMetaData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/metadata/get-all", {
-        headers: { authentication: localStorage.getItem("userId") || "" },
-      });
+      const response = await fetch(
+        "https://finance-tracker-5mv4.onrender.com/metadata/get-all",
+        {
+          headers: { authentication: localStorage.getItem("userId") || "" },
+        }
+      );
       const data = await response.json();
       if (data.status) {
         settotalIncome(data.data.income.total);

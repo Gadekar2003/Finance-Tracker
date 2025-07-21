@@ -88,7 +88,9 @@ export default function BudgetPage() {
   ];
   const getAllBudget = async () => {
     try {
-      const response = await fetch("http://localhost:5000/budget/get-all");
+      const response = await fetch(
+        "https://finance-tracker-5mv4.onrender.com/budget/get-all"
+      );
       const data = await response.json();
       if (data.status) {
         setBudgets(
@@ -112,7 +114,7 @@ export default function BudgetPage() {
     const newBudget = {
       id: editingBudget ? editingBudget._id : Date.now(),
       category: filterCategory,
-      budget: Number.parseFloat(formData.budget),
+      amount: Number.parseFloat(formData.budget),
       spent: editingBudget ? editingBudget.spent : 0,
       color: editingBudget ? editingBudget.color : "bg-gray-500",
     };
@@ -120,15 +122,18 @@ export default function BudgetPage() {
 
     if (editingBudget) {
       try {
-        const response = await fetch("http://localhost:5000/budget/update", {
-          method: "PATCH",
-          body: JSON.stringify({
-            _id: editingBudget._id,
-            category: newBudget.category,
-            amount: newBudget.budget,
-          }),
-          headers: { "content-type": "application/json" },
-        });
+        const response = await fetch(
+          "https://finance-tracker-5mv4.onrender.com/budget/update",
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              _id: editingBudget._id,
+              category: newBudget.category,
+              amount: newBudget.amount,
+            }),
+            headers: { "content-type": "application/json" },
+          }
+        );
         const data = await response.json();
         if (data.status) {
           getAllBudget();
@@ -138,13 +143,17 @@ export default function BudgetPage() {
       } catch (error) {}
     } else {
       try {
-        const response = await fetch("http://localhost:5000/budget/create", {
-          method: "POST",
-          body: JSON.stringify(newBudget),
-          headers: { "content-type": "application/json" },
-        });
+        const response = await fetch(
+          "https://finance-tracker-5mv4.onrender.com/budget/create",
+          {
+            method: "POST",
+            body: JSON.stringify(newBudget),
+            headers: { "content-type": "application/json" },
+          }
+        );
         const data = await response.json();
         if (data.status) {
+          getAllBudget();
         } else {
           throw new Error("unable to create budget");
         }
@@ -173,11 +182,14 @@ export default function BudgetPage() {
   );
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch("http://localhost:5000/budget/delete", {
-        method: "DELETE",
-        body: JSON.stringify({ _id: id }),
-        headers: { "content-type": "application/json" },
-      });
+      const response = await fetch(
+        "https://finance-tracker-5mv4.onrender.com/budget/delete",
+        {
+          method: "DELETE",
+          body: JSON.stringify({ _id: id }),
+          headers: { "content-type": "application/json" },
+        }
+      );
       const data = await response.json();
       if (data.status) {
         await getAllBudget();

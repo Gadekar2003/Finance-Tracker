@@ -27,11 +27,14 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     // Demo login - redirect to dashboard
-    const response = await fetch("http://localhost:5000/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-      headers: { "content-type": "application/json" },
-    });
+    const response = await fetch(
+      "https://finance-tracker-5mv4.onrender.com/auth/login",
+      {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: { "content-type": "application/json" },
+      }
+    );
     const data = await response.json();
     if (data.status) {
       localStorage.setItem("username", data.data.name);
