@@ -13,11 +13,26 @@ The Personal Finance Tracker is a full-stack web application that helps users tr
 
 ## 🚀 Deployed App
 
-- **Frontend**: [https://your-frontend-url.com](https://your-frontend-url.com)
-- **Backend**: [https://your-backend-url.com](https://your-backend-url.com)
+- **Frontend**: [https://your-frontend-url.com](https://finance-tracker-r31hdwepm-gadekar2003s-projects.vercel.app)
+- **Backend**: [https://your-backend-url.com](https://finance-tracker-5mv4.onrender.com/)
 - **Database**: MongoDB Atlas
 
 ---
+## Screenshots:-
+1)Dashboard 
+<img width="1343" height="596" alt="image" src="https://github.com/user-attachments/assets/88d69efa-b5bd-4d1b-a8f5-6497f1c6ac98" /> </br>
+
+2)Income Page
+<img width="1349" height="590" alt="image" src="https://github.com/user-attachments/assets/063a0b20-7099-437c-97f9-9bcde7b3f1f9" /> </br>
+
+3)Expense Page
+<img width="1353" height="604" alt="image" src="https://github.com/user-attachments/assets/fc45896b-3e87-440b-9921-bdb4b600dd80" /> </br>
+
+4)Budget Page
+<img width="1340" height="596" alt="image" src="https://github.com/user-attachments/assets/5eb82bbb-95db-4e4a-8eaa-b12569221169" /> </br>
+
+5)Saving Goals 
+<img width="1338" height="598" alt="image" src="https://github.com/user-attachments/assets/36b32458-6d9b-4992-be14-8dcf8779f75f" />
 
 ## 📁 Directory Structure
 
